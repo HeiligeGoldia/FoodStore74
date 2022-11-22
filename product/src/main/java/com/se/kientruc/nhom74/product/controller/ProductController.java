@@ -23,12 +23,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+@Component
 @RestController
 @RequestMapping("/api/product")
 public class ProductController {
 
     @Autowired
     ProductRepository productRepository;
+
+    @Autowired
+    RestTemplate restTemplate;
 
     JedisPool jedisPool = new JedisPool("127.0.0.1");
     Jedis jedis = jedisPool.getResource();
@@ -74,4 +78,6 @@ public class ProductController {
         jedis.del("cart");
         return "Done";
     }
+
+
 }
