@@ -79,5 +79,20 @@ public class ProductController {
         return "Done";
     }
 
-
+    @GetMapping("/getUserFavorite/{email}")
+    @Retry(name = "favorite")
+    public List<Product> get(@PathVariable("email") String email) {
+        List<Product> pl = new ArrayList<>();
+        String url = "http://192.168.1.2:8083/api/favorite/userFavorite/" + email;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        HttpEntity<String> entity = new HttpEntity<String>(headers);
+        String js = restTemplate.exchange(url, HttpMethod.GET, entity, String.class).getBody();
+        JSONArray array = new JSONArray(js);
+        for (int i = 0; i < array.length(); i++) {
+            JSONObject object = array.getJSONObject(i);
+            pl.add(productRepository.getById(String.valueOf(object.getInt("fid"))));
+        }
+        return pl;
+    }
 }
