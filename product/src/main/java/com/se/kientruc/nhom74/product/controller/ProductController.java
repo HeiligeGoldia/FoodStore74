@@ -83,7 +83,7 @@ public class ProductController {
     @Retry(name = "favorite")
     public List<Product> get(@PathVariable("email") String email) {
         List<Product> pl = new ArrayList<>();
-        String url = "http://192.168.1.2:8083/api/favorite/userFavorite/" + email;
+        String url = "http://192.168.1.13:8083/api/favorite/userFavorite/" + email;
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         HttpEntity<String> entity = new HttpEntity<String>(headers);
