@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.util.SerializationUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import redis.clients.jedis.Jedis;
@@ -59,17 +60,25 @@ public class ProductController {
 
     @PostMapping("/addToCart")
     public String addToCart(@RequestBody Product product){
-        jedis.sadd("cart", String.valueOf(product.getPid()));
+        byte[] key = SerializationUtils.serialize("cart");
+        byte[] data = SerializationUtils.serialize(product);
+        jedis.sadd(key, data);
         return "Added to cart";
     }
 
     @GetMapping("/getFromCart")
-    public List<Product> getFromCart(){
-        List<Product> cart = new ArrayList<>();
-        Set<String> cart_items = jedis.smembers("cart");
-        for(String id : cart_items){
-            cart.add(productRepository.getById(id));
+    public List<Object> getFromCart(){
+        List<Object> cart = new ArrayList<>();
+        byte[] key = SerializationUtils.serialize("cart");
+        Set<byte[]> cart_items = jedis.smembers(key);
+        for (byte[] b : cart_items){
+            Object deserialized = SerializationUtils.deserialize(b);
+            cart.add(deserialized);
         }
+//        for(String id : cart_items){
+//            cart.add(productRepository.getById(id));
+//        }
+        System.out.println(cart_items);
         return cart;
     }
 
